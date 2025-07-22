@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Abaixo-Assinado</title>
+  <style>
+    body { font-family: Arial; max-width: 600px; margin: auto; padding: 30px; background: #f4f4f4; }
+    h1, h2 { color: #333; }
+    input[type="text"] { width: 80%; padding: 10px; margin-right: 10px; }
+    button { padding: 10px 20px; background: #1e88e5; color: white; border: none; cursor: pointer; }
+    ul { padding-left: 0; list-style: none; }
+    li { background: white; margin-bottom: 5px; padding: 10px; border-left: 5px solid #1e88e5; }
+    #mensagem { color: green; display: none; margin-top: 10px; }
+  </style>
+</head>
+<body>
+
+  <h1>Abaixo-Assinado</h1>
+  <p>Assine para apoiar-me a persuadir minha mãe a permitir que eu vá à festa junina Lanaiada.</p>
+
+  <form id="form">
+    <label for="nome">Seu nome:</label><br>
+    <input type="text" id="nome" placeholder="Digite seu nome" required />
+    <button type="submit" aria-label="Assinar abaixo-assinado">Assinar</button>
+  </form>
+
+  <p id="mensagem">Assinatura registrada com sucesso!</p>
+
+  <h2>Assinaturas:</h2>
+  <ul id="lista"></ul>
+
+  <script>
+    const form = document.getElementById('form');
+    const inputNome = document.getElementById('nome');
+    const lista = document.getElementById('lista');
+    const mensagem = document.getElementById('mensagem');
+    const API_URL = 'https://script.google.com/macros/s/AKfycbyzRc0fvCeOqIu3BgWV9EpOSWZVELLPiI_RFb69Ci1euDLClGFvWtFkltNeF4XTryxtww/exec';
+
+    // Enviar assinatura
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const nome = inputNome.value.trim();
+      if (!nome) return;
+
+      await fetch(API_URL, {
+        method: 'POST',
+        body: JSON.stringify({ nome }),
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      inputNome.value = '';
+      mensagem.style.display = 'block';
+      setTimeout(() => mensagem.style.display = 'none', 3000);
+      carregarAssinaturas();
+    });
+
+    // Carregar lista de assinaturas
+    async function carregarAssinaturas() {
+      const res = await fetch(API_URL);
+      const nomes = await res.json();
+
+      lista.innerHTML = '';
+      nomes.forEach(pessoa => {
+        const li = document.createElement('li');
+        li.textContent = pessoa.nome;
+        lista.appendChild(li);
+      });
+    }
+
+    // Carrega ao abrir
+    carregarAssinaturas();
+  </script>
+
+</body>
+</html>
